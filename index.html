@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News | justalog</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans JP', sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh; font-size: 16px; }
+
+/* HEADER */
+.header {
+  border-bottom: 1px solid #2a2a2a;
+  padding: 20px 32px 20px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo { font-family: 'Space Mono', monospace; font-size: 26px; color: #fff; text-decoration: none; }
+.header-logo span { color: #3fb950; }
+.header-time { font-family: 'Space Mono', monospace; font-size: 14px; color: #666; }
+
+/* BREADCRUMB */
+.breadcrumb {
+  padding: 14px 48px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #555;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid #222;
+}
+.breadcrumb a { color: #555; text-decoration: none; }
+.breadcrumb a:hover { color: #3fb950; }
+.breadcrumb span { color: #3fb950; }
+
+/* LAYOUT */
+.wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+/* PAGE TITLE */
+.page-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
+  color: #c8c8c8;
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+.page-title span { color: #3fb950; }
+.page-desc { font-size: 14px; color: #666; margin-bottom: 48px; }
+
+/* SECTION HEADER */
+.sec-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.sec-label { font-family: 'Space Mono', monospace; font-size: 13px; color: #3fb950; letter-spacing: 0.15em; text-transform: uppercase; }
+.sec-line { flex: 1; height: 1px; background: #2a2a2a; }
+
+/* CATEGORY GRID */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.cat-card {
+  background: #1e2430;
+  border: 1px solid #2a3140;
+  border-radius: 10px;
+  padding: 28px 24px;
+  text-decoration: none;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.cat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3fb950, #2ea043);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+  transform-origin: left;
+}
+.cat-card:hover { border-color: #3fb950; transform: translateY(-3px); }
+.cat-card:hover::before { transform: scaleX(1); }
+
+.cat-icon { font-size: 36px; margin-bottom: 16px; }
+.cat-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  color: #c8c8c8;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+.cat-card:hover .cat-title { color: #fff; }
+.cat-desc { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 16px; }
+.cat-badge {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #3fb950;
+  border: 1px solid #1a3d20;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+/* LATEST ARTICLES */
+.article-list {
+  background: #1e2430;
+  border: 1px solid #2a3140;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+.article-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #2a3140;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.article-row:last-child { border-bottom: none; }
+.article-row:hover { background: #232d3f; }
+.article-cat {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #3fb950;
+  border: 1px solid #1a3d20;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  min-width: 60px;
+  text-align: center;
+}
+.article-title { font-size: 14px; color: #c8c8c8; flex: 1; line-height: 1.6; }
+.article-row:hover .article-title { color: #fff; }
+.article-date { font-family: 'Space Mono', monospace; font-size: 11px; color: #555; white-space: nowrap; }
+
+/* BACK LINK */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-link:hover { color: #3fb950; }
+
+/* AUTO UPDATE BADGE */
+.update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #3fb950;
+  background: #0d2010;
+  border: 1px solid #1a3d20;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 48px;
+}
+.update-dot {
+  width: 6px; height: 6px;
+  background: #3fb950;
+  border-radius: 50%;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+@media (max-width: 768px) {
+  .cat-grid { grid-template-columns: 1fr; }
+  .breadcrumb { padding: 12px 24px; }
+  .header { padding: 16px 24px; }
+  .wrap { padding: 24px 16px; }
+  .page-title { font-size: 22px; }
+  .article-date { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="https://justalog.jp/" class="header-logo">just<span>a</span>log</a>
+  <div class="header-time" id="clock"></div>
+</div>
+
+<div class="breadcrumb">
+  <a href="https://justalog.jp/">HOME</a> / <span>NEWS</span>
+</div>
+
+<div class="wrap">
+
+  <div class="page-title">N<span>e</span>ws</div>
+  <div class="page-desc">AI・Tech・Gadgetの最新情報を自動で収集・まとめています。</div>
+
+  <div class="update-badge">
+    <div class="update-dot"></div>
+    毎日自動更新
+  </div>
+
+  <!-- カテゴリ -->
+  <div class="sec-header">
+    <span class="sec-label">Categories</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="cat-grid">
+
+    <a class="cat-card" href="./ai/">
+      <img src="./img/ai_computer_sousa_robot.png" alt="AI" style="width:80px;height:80px;object-fit:contain;margin-bottom:16px;">
+      <div class="cat-title">AI</div>
+      <div class="cat-desc">最新のAIツール・研究・サービスの情報をまとめています。</div>
+      <span class="cat-badge">Auto Updated</span>
+    </a>
+
+    <a class="cat-card" href="./tech/">
+      <img src="./img/omocha_asobu_man.png" alt="Tech" style="width:80px;height:80px;object-fit:contain;margin-bottom:16px;">
+      <div class="cat-title">Tech</div>
+      <div class="cat-desc">テクノロジー・ソフトウェア・開発系の最新ニュースをまとめています。</div>
+      <span class="cat-badge">Auto Updated</span>
+    </a>
+
+    <a class="cat-card" href="./gadget/">
+      <img src="./img/computer_nekorogaru_man.png" alt="Gadget" style="width:80px;height:80px;object-fit:contain;margin-bottom:16px;">
+      <div class="cat-title">Gadget</div>
+      <div class="cat-desc">新作ガジェット・スマホ・PC周辺機器の情報をまとめています。</div>
+      <span class="cat-badge">Auto Updated</span>
+    </a>
+
+  </div>
+
+  <!-- 最新記事一覧（Pythonが自動で書き換える部分） -->
+  <div class="sec-header">
+    <span class="sec-label">Latest</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="article-list" id="latest-articles">
+    <!-- ここはPythonが自動で書き換えます -->
+    <div class="article-row">
+      <span class="article-cat">AI</span>
+      <span class="article-title">記事タイトルがここに入ります（自動生成）</span>
+      <span class="article-date">2026-03-23</span>
+    </div>
+    <div class="article-row">
+      <span class="article-cat">Tech</span>
+      <span class="article-title">記事タイトルがここに入ります（自動生成）</span>
+      <span class="article-date">2026-03-23</span>
+    </div>
+    <div class="article-row">
+      <span class="article-cat">Gadget</span>
+      <span class="article-title">記事タイトルがここに入ります（自動生成）</span>
+      <span class="article-date">2026-03-23</span>
+    </div>
+  </div>
+
+  <a href="https://justalog.jp/" class="back-link">← justalog.jp に戻る</a>
+
+</div>
+
+<script>
+function updateClock() {
+  const t = new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  document.getElementById('clock').textContent = t;
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+</body>
+</html>
