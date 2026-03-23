@@ -1,0 +1,35 @@
+name: Update News
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 毎日UTC 0:00 = 日本時間 9:00
+  workflow_dispatch:       # 手動実行も可能
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic feedparser
+
+      - name: Run news generator
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python generate_news.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ai/index.html tech/index.html gadget/index.html
+          git diff --cached --quiet || git commit -m "Auto update news $(date +'%Y-%m-%d')"
+          git push
