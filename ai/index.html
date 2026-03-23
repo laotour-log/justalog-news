@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI News | justalog</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans JP', sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh; font-size: 16px; }
+
+/* HEADER */
+.site-header {
+  border-bottom: 1px solid #2a2a2a;
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 16px;
+  background: #1a1a1a;
+}
+.logo a {
+  font-family: 'Space Mono', monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.logo a span { color: #3fb950; }
+.breadcrumb {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #555;
+  display: flex; align-items: center; gap: 6px;
+}
+.breadcrumb a { color: #555; text-decoration: none; }
+.breadcrumb a:hover { color: #3fb950; }
+.breadcrumb-sep { color: #333; }
+
+/* LAYOUT */
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+/* PAGE TITLE */
+.page-title-block { margin-bottom: 32px; }
+.page-category-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #3fb950;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 6px;
+}
+.page-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* SECTION HEADER */
+.sec-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.sec-label { font-family: 'Space Mono', monospace; font-size: 12px; color: #3fb950; letter-spacing: 0.15em; text-transform: uppercase; }
+.sec-line { flex: 1; height: 1px; background: #2a2a2a; }
+
+/* LATEST ARTICLE (featured) */
+.featured-card {
+  background: #222;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+.featured-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #3fb950, #2ea043);
+}
+.featured-card:hover { border-color: #3fb950; }
+.featured-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #3fb950;
+  border: 1px solid #1a3d20;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.featured-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e0e0e0;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.featured-card:hover .featured-title { color: #fff; }
+.featured-summary {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+.featured-meta {
+  display: flex; align-items: center; gap: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #555;
+}
+.featured-meta-tag { color: #3fb950; }
+
+/* ARTICLE LIST */
+.article-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 40px; }
+.article-item {
+  background: #222;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex; gap: 16px; align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+}
+.article-item:hover { border-color: #3fb950; background: #272727; }
+.article-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  color: #3fb950;
+  opacity: 0.4;
+  min-width: 28px;
+  padding-top: 2px;
+}
+.article-body { flex: 1; }
+.article-title {
+  font-size: 15px;
+  color: #c8c8c8;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.article-item:hover .article-title { color: #fff; }
+.article-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #555;
+}
+
+/* NO ARTICLES */
+.no-articles {
+  text-align: center;
+  padding: 60px 20px;
+  color: #444;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+}
+
+/* BACK LINK */
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-link:hover { color: #3fb950; }
+
+@media (max-width: 768px) {
+  .wrap { padding: 24px 16px; }
+  .featured-title { font-size: 17px; }
+  .page-title { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="logo"><a href="https://justalog.jp/">just<span>a</span>log</a></div>
+  <div class="breadcrumb">
+    <a href="https://justalog.jp/">HOME</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="https://laotour-log.github.io/justalog-news/">NEWS</a>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:#c8c8c8;">AI</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PAGE TITLE -->
+  <div class="page-title-block">
+    <div class="page-category-label">Category</div>
+    <div class="page-title">AI News</div>
+    <div class="page-desc">最新のAIツール・研究・サービスの情報をまとめています。自動更新。</div>
+  </div>
+
+  <!-- LATEST -->
+  <div class="sec-header">
+    <span class="sec-label">Latest</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <!-- ▼ FEATURED: Pythonが最新1件をここに出力する -->
+  <!-- FEATURED_START -->
+  <div class="no-articles">記事はまだありません。</div>
+  <!-- FEATURED_END -->
+
+  <!-- ALL ARTICLES -->
+  <div class="sec-header">
+    <span class="sec-label">All Articles</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <!-- ▼ ARTICLES: Pythonが記事をここに追記していく -->
+  <!-- ARTICLES_START -->
+  <!-- ARTICLES_END -->
+
+  <!-- BACK -->
+  <a href="https://laotour-log.github.io/justalog-news/" class="back-link">← News トップへ戻る</a>
+
+</div>
+
+</body>
+</html>
