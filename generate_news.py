@@ -80,8 +80,7 @@ def summarize(client, item):
         )
         text = message.content[0].text.strip()
         print(f"  API response: {repr(text[:100])}")  # ← 追加
-        text = re.sub(r'```(?:json)?\s*', '', text)
-        text = re.sub(r'```', '', text)
+        text = re.sub(r'```(?:json)?', '', text)
         text = text.strip()
         data = json.loads(text)
         return data.get("title_ja", item["title"]), data.get("summary_ja", "")
