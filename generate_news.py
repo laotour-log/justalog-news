@@ -1,17 +1,18 @@
 import os
 import re
+import json
 import anthropic
 import feedparser
 from datetime import datetime
 
 # ── 設定 ──────────────────────────────────────────
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-COUNT = 3  # 各カテゴリの記事数
+COUNT = 3
 
 FEEDS = {
     "ai": [
-        "https://feeds.feedburner.com/venturebeat/SZYF",   # VentureBeat AI
-        "https://techcrunch.com/feed/",                    # TechCrunch
+        "https://feeds.feedburner.com/venturebeat/SZYF",
+        "https://techcrunch.com/feed/",
     ],
     "tech": [
         "https://techcrunch.com/feed/",
@@ -21,6 +22,12 @@ FEEDS = {
         "https://feeds.feedburner.com/engadget",
         "https://www.theverge.com/rss/index.xml",
     ],
+}
+
+CATEGORY_LABEL = {
+    "ai": "AI",
+    "tech": "テクノロジー",
+    "gadget": "ガジェット",
 }
 
 AI_KEYWORDS    = ["ai", "artificial intelligence", "llm", "gpt", "claude", "gemini", "openai", "machine learning", "chatgpt", "generative"]
@@ -72,6 +79,7 @@ def summarize(client, item):
 以下のJSON形式のみで返してください（マークダウンのコードブロックや前置き・説明は一切不要）:
 {{"title_ja": "日本語タイトル（40文字以内）", "summary_ja": "日本語要約（100文字以内）"}}"""
 
+    text = ""
     try:
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
@@ -79,30 +87,33 @@ def summarize(client, item):
             messages=[{"role": "user", "content": prompt}]
         )
         text = message.content[0].text.strip()
-        print(f"  API response: {repr(text[:100])}")  # ← 追加
-        text = re.sub(r'```(?:json)?', '', text)
+        # コードブロック（```json ... ```）を除去
+        text = re.sub(r'```json', '', text)
+        text = re.sub(r'```', '', text)
         text = text.strip()
         data = json.loads(text)
         return data.get("title_ja", item["title"]), data.get("summary_ja", "")
     except Exception as e:
-        print(f"Claude API error: {e} / response: {repr(text) if 'text' in dir() else 'N/A'}")
+        print(f"Claude API error: {e} / response: {repr(text)}")
         return item["title"], ""
 
 # ── HTML生成 ───────────────────────────────────────
-def make_featured(item, title_ja, summary_ja, date_str):
+def make_featured(item, title_ja, summary_ja, date_str, category):
+    label = CATEGORY_LABEL.get(category, category.upper())
     return f"""<a class="featured-card" href="{item['link']}" target="_blank" rel="noopener noreferrer">
-  <div class="featured-badge">Latest</div>
+  <div class="featured-badge">最新</div>
   <div class="featured-title">{title_ja}</div>
   <div class="featured-summary">{summary_ja}</div>
   <div class="featured-meta">
-    <span class="featured-meta-tag">AI</span>
+    <span class="featured-meta-tag">{label}</span>
     <span>{date_str}</span>
   </div>
 </a>"""
 
 def make_article_item(index, item, title_ja, date_str):
+    num = str(index).zfill(2)
     return f"""<a class="article-item" href="{item['link']}" target="_blank" rel="noopener noreferrer">
-  <div class="article-num">0{index}</div>
+  <div class="article-num">{num}</div>
   <div class="article-body">
     <div class="article-title">{title_ja}</div>
     <div class="article-meta">{date_str}</div>
@@ -117,12 +128,12 @@ def update_html(category, articles):
 
     today = datetime.now().strftime("%Y-%m-%d")
 
-    # Featured（最新1件）
     featured_html = make_featured(
         articles[0]["item"],
         articles[0]["title_ja"],
         articles[0]["summary_ja"],
-        today
+        today,
+        category
     )
     html = re.sub(
         r'<!-- FEATURED_START -->.*?<!-- FEATURED_END -->',
@@ -130,20 +141,11 @@ def update_html(category, articles):
         html, flags=re.DOTALL
     )
 
-    # 記事一覧（全件）
     items_html = "\n".join([
         make_article_item(i + 1, a["item"], a["title_ja"], today)
         for i, a in enumerate(articles)
     ])
 
-    # 既存の記事リストを読み込んで先頭に追加
-    existing_match = re.search(
-        r'<!-- ARTICLES_START -->(.*?)<!-- ARTICLES_END -->',
-        html, re.DOTALL
-    )
-    existing = existing_match.group(1).strip() if existing_match else ""
-
-    # 記事リストを更新（新しいものを上に、最大30件まで保持）
     all_items = f'<div class="article-list">\n{items_html}\n</div>'
     html = re.sub(
         r'<!-- ARTICLES_START -->.*?<!-- ARTICLES_END -->',
@@ -170,6 +172,7 @@ def main():
         for item in items:
             print(f"処理中: {item['title'][:50]}...")
             title_ja, summary_ja = summarize(client, item)
+            print(f"  → {title_ja}")
             articles.append({
                 "item": item,
                 "title_ja": title_ja,
