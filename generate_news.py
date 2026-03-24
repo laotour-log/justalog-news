@@ -69,11 +69,8 @@ def summarize(client, item):
 タイトル: {item['title']}
 内容: {item['summary']}
 
-以下のJSON形式のみで返してください（前置き・説明不要）:
-{{
-  "title_ja": "日本語タイトル（40文字以内）",
-  "summary_ja": "日本語要約（100文字以内）"
-}}"""
+以下のJSON形式のみで返してください（マークダウンのコードブロックや前置き・説明は一切不要）:
+{{"title_ja": "日本語タイトル（40文字以内）", "summary_ja": "日本語要約（100文字以内）"}}"""
 
     try:
         message = client.messages.create(
@@ -82,11 +79,14 @@ def summarize(client, item):
             messages=[{"role": "user", "content": prompt}]
         )
         text = message.content[0].text.strip()
-        import json
+        print(f"  API response: {repr(text[:100])}")  # ← 追加
+        text = re.sub(r'```(?:json)?\s*', '', text)
+        text = re.sub(r'```', '', text)
+        text = text.strip()
         data = json.loads(text)
         return data.get("title_ja", item["title"]), data.get("summary_ja", "")
     except Exception as e:
-        print(f"Claude API error: {e}")
+        print(f"Claude API error: {e} / response: {repr(text) if 'text' in dir() else 'N/A'}")
         return item["title"], ""
 
 # ── HTML生成 ───────────────────────────────────────
